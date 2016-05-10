@@ -28,14 +28,16 @@ Ball.prototype = {
 };
 
 
-var Ship = function(x, y, player) {
+var Ship = function(game, x, y, rotation, player) {
+  this.game = game;
+
   this.x = x;
   this.y = y;
   this.w = 36;
   this.h = 36;
   this.r = this.w / 2;
 
-  this.rotation = 0;
+  this.rotation = rotation;
   this.rotateVel = 0.05;
   this.rotateDir = 0; //-1:left 0:none 1:right
 
@@ -45,6 +47,8 @@ var Ship = function(x, y, player) {
   this.maxAccel = .4;
   this.maxVel = 4;
 
+  this.bounceDampen = 0.5;
+
   this.player = player;
 };
 
@@ -52,13 +56,20 @@ var Ship = function(x, y, player) {
 
 Ship.prototype = {
 
-  //not really center fix later
-  centerX: function() {
+  left: function() {
     return this.x - this.w / 2;
   },
 
-  centerY: function() {
+  top: function() {
     return this.y - this.h / 2;
+  },
+
+  right: function() {
+    return this.x + this.w / 2;
+  },
+
+  bottom: function() {
+    return this.y + this.h / 2;
   },
 
   capVelocity: function() {
@@ -80,6 +91,12 @@ Ship.prototype = {
     this.accel.y = Math.sin(this.rotation) * this.maxAccel;
   },
 
+  //maybe make this slow the velocity to 0
+  deccelerate: function() {
+    this.accel.x = Math.cos(this.rotation + Math.PI) * this.maxAccel * 0.2;
+    this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.2;
+  },
+
   logic: function() {
     this.rotation += this.rotateVel * this.rotateDir;
     this.vel.x += this.accel.x;
@@ -88,6 +105,24 @@ Ship.prototype = {
     // if(this.vel > this.maxVel) this.vel = this.maxVel;
     this.x += this.vel.x;
     this.y += this.vel.y;
+
+    if(this.left() < 0) {
+      this.x = this.w / 2;
+      this.vel.x = -this.vel.x * this.bounceDampen;
+    }
+    else if(this.right() > this.game.width){
+      this.x = this.game.width - this.w / 2;
+      this.vel.x = -this.vel.x * this.bounceDampen;
+    }
+
+    if(this.top() < 0) {
+      this.y = this.h / 2;
+      this.vel.y = -this.vel.y * this.bounceDampen;
+    }
+    else if(this.bottom() > this.game.height){
+      this.y = this.game.height - this.h / 2;
+      this.vel.y = -this.vel.y * this.bounceDampen;
+    }
   },
 
   draw: function(ctx, img) {

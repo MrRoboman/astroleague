@@ -10,6 +10,7 @@ window.keys = {
 };
 
 window.addEventListener('keydown', function(e) {
+  console.log(e.keyCode);
   switch(e.keyCode) {
     case 37:
       window.keys.LEFT = true;
@@ -22,6 +23,18 @@ window.addEventListener('keydown', function(e) {
       break;
     case 40:
       window.keys.DOWN = true;
+      break;
+    case 65:
+      window.keys.A = true;
+      break;
+    case 87:
+      window.keys.W = true;
+      break;
+    case 68:
+      window.keys.D = true;
+      break;
+    case 83:
+      window.keys.S = true;
       break;
   }
 });
@@ -39,6 +52,18 @@ window.addEventListener('keyup', function(e) {
       break;
     case 40:
       window.keys.DOWN = false;
+      break;
+    case 65:
+      window.keys.A = false;
+      break;
+    case 87:
+      window.keys.W = false;
+      break;
+    case 68:
+      window.keys.D = false;
+      break;
+    case 83:
+      window.keys.S = false;
       break;
   }
 });
