@@ -19,13 +19,16 @@ document.addEventListener('DOMContentLoaded', function() {
   Game.prototype = {
 
     handleInput: function() {
-      this.p0.rotateDir = 0;
+      this.p0.normalize();
 
       if(window.keys.LEFT) {
         this.p0.rotateDir -= 1;
       }
       if(window.keys.RIGHT) {
         this.p0.rotateDir += 1;
+      }
+      if(window.keys.UP) {
+        this.p0.accelerate();
       }
     },
 

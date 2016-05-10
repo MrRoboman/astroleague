@@ -39,6 +39,12 @@ var Ship = function(x, y, player) {
   this.rotateVel = 0.05;
   this.rotateDir = 0; //-1:left 0:none 1:right
 
+  this.accel = {x:0, y:0};
+  this.vel = {x:0, y:0};
+
+  this.maxAccel = .4;
+  this.maxVel = 4;
+
   this.player = player;
 };
 
@@ -55,8 +61,33 @@ Ship.prototype = {
     return this.y - this.h / 2;
   },
 
+  capVelocity: function() {
+    var vel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
+    if(vel > this.maxVel){
+      var angle = Math.atan2(this.vel.y, this.vel.x);
+      this.vel.x = Math.cos(angle) * this.maxVel;
+      this.vel.y = Math.sin(angle) * this.maxVel;
+    }
+  },
+
+  normalize: function() {
+    this.rotateDir = 0;
+    this.accel.x = this.accel.y = 0;
+  },
+
+  accelerate: function() {
+    this.accel.x = Math.cos(this.rotation) * this.maxAccel;
+    this.accel.y = Math.sin(this.rotation) * this.maxAccel;
+  },
+
   logic: function() {
     this.rotation += this.rotateVel * this.rotateDir;
+    this.vel.x += this.accel.x;
+    this.vel.y += this.accel.y;
+    this.capVelocity();
+    // if(this.vel > this.maxVel) this.vel = this.maxVel;
+    this.x += this.vel.x;
+    this.y += this.vel.y;
   },
 
   draw: function(ctx, img) {
