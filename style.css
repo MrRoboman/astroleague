@@ -1,0 +1,9 @@
+#canvas-container {
+  display: flex;
+  justify-content: center;
+}
+
+#canvas {
+  background: lightgreen;
+  margin-top: 100px;
+}
