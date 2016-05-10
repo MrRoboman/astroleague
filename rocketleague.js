@@ -11,13 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   var Game = function() {
-    this.p1 = new Ship(200, 200, 0);
+    this.p0 = new Ship(200, 200, 1);
     window.requestAnimationFrame(this.update.bind(this));
   };
 
   Game.prototype = {
     update: function() {
-      this.p1.draw(ctx, shipSprite);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.p0.draw(ctx, shipSprite);
       window.requestAnimationFrame(this.update.bind(this));
     }
   };

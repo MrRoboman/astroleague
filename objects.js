@@ -34,6 +34,7 @@ var Ship = function(x, y, player) {
   this.w = 36;
   this.h = 36;
   this.r = this.w / 2;
+  this.rotation = 0;
   this.player = player;
 };
 
@@ -51,11 +52,17 @@ Ship.prototype = {
   },
 
   draw: function(ctx, img) {
-    var x = 0, y = 0, w = 36, h = 36;
+    var x = 0, y = 0, w = this.w, h = this.h;
     if(this.player === 1) {
-      x = 36;
+      x = this.w;
     }
 
-    ctx.drawImage(img, x, y, w, h, this.centerX(), this.centerY(), this.w, this.h);
+    this.rotation += 0.01;
+
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.drawImage(img, x, y, w, h, -this.w/2, -this.h/2, this.w, this.h);
+    ctx.rotate(-this.rotation);
+    ctx.translate(-this.x, -this.y);
   }
 };
