@@ -1,3 +1,6 @@
+var shipSprite = new Image();
+shipSprite.src = './gfx/ships.png';
+
 document.addEventListener('DOMContentLoaded', function() {
 
   var canvas = document.getElementById('canvas');
@@ -8,13 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   var Game = function() {
-    this.p1 = new Ball(50, 50, 20, "#ff0000");
-    this.update();
+    this.p1 = new Ship(200, 200, 0);
+    window.requestAnimationFrame(this.update.bind(this));
   };
 
   Game.prototype = {
     update: function() {
-      this.p1.draw(ctx);
+      this.p1.draw(ctx, shipSprite);
+      window.requestAnimationFrame(this.update.bind(this));
     }
   };
 
