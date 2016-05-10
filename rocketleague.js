@@ -12,11 +12,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var Game = function() {
     this.p0 = new Ship(200, 200, 1);
+
     window.requestAnimationFrame(this.update.bind(this));
   };
 
   Game.prototype = {
+
+    handleInput: function() {
+      this.p0.rotateDir = 0;
+
+      if(window.keys.LEFT) {
+        this.p0.rotateDir -= 1;
+      }
+      if(window.keys.RIGHT) {
+        this.p0.rotateDir += 1;
+      }
+    },
+
     update: function() {
+
+      //input
+      this.handleInput();
+
+      //logic
+      this.p0.logic();
+
+      //draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.p0.draw(ctx, shipSprite);
       window.requestAnimationFrame(this.update.bind(this));
