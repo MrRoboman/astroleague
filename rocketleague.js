@@ -24,20 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   Game.prototype = {
 
-    collision: function(a, b) {
-      if(a.left() > b.right() && a.right() < b.left() &&
-         a.top() > b.bottom() && a.bottom() < b.top()) {
-           return false;
-      }
-      var x = a.x - b.x;
-      var y = a.y - b.y;
-      if(Math.sqrt(x*x + y*y) > a.r + b.r){
-        return false;
-      }
-
-      return true;
-    },
-
     handleInput: function() {
       this.sprites.forEach(function(sprite) {
         sprite.normalize();
@@ -80,15 +66,13 @@ document.addEventListener('DOMContentLoaded', function() {
         sprite.logic();
       });
 
-      if(this.collision(this.sprites[0], this.sprites[1])){
-        
-      }
-
       //draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.sprites.forEach(function(sprite) {
         sprite.draw(ctx, shipSprite);
       });
+
+      this.sprites[0].resolveCollision(this.sprites[1]);
 
       window.requestAnimationFrame(this.update.bind(this));
     }

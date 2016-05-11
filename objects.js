@@ -72,10 +72,18 @@ Ship.prototype = {
     return this.y + this.h / 2;
   },
 
+  getCurrentAngle: function() {
+    return Math.atan2(this.vel.y, this.vel.x);
+  },
+
+  getMag: function() {
+    return Math.sqrt(this.vel.y * this.vel.y + this.vel.x * this.vel.x);
+  },
+
   capVelocity: function() {
     var vel = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
     if(vel > this.maxVel){
-      var angle = Math.atan2(this.vel.y, this.vel.x);
+      var angle = this.getCurrentAngle()
       this.vel.x = Math.cos(angle) * this.maxVel;
       this.vel.y = Math.sin(angle) * this.maxVel;
     }
@@ -95,6 +103,74 @@ Ship.prototype = {
   deccelerate: function() {
     this.accel.x = Math.cos(this.rotation + Math.PI) * this.maxAccel * 0.2;
     this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.2;
+  },
+
+  resolveCollision: function(other) {
+    var diffVect = {
+      x: other.x - this.x,
+      y: other.y - this.y
+    };
+
+    var diffMag = Math.sqrt(diffVect.y * diffVect.y + diffVect.x * diffVect.x);
+
+    if(diffMag >= this.r + other.r) return;
+
+    var theta = Math.atan2(diffVect.y, diffVect.x);
+    var sine = Math.sin(theta);
+    var cosine = Math.cos(theta);
+
+    var bTemp = [
+      {x:0, y:0},
+      {x:0, y:0}
+    ];
+
+    bTemp[1].x = cosine * diffVect.x + sine * diffVect.y;
+    bTemp[1].y = cosine * diffVect.y - sine * diffVect.x;
+
+    var vTemp = [
+      {x:0, y:0},
+      {x:0, y:0}
+    ];
+
+    vTemp[0].x = cosine * this.vel.x + sine * this.vel.y;
+    vTemp[0].y = cosine * this.vel.y - sine * this.vel.x;
+    vTemp[1].x = cosine * other.vel.x + sine * other.vel.y;
+    vTemp[1].y = cosine * other.vel.y - sine * other.vel.x;
+
+    var vFinal = [
+      {x:0, y:0},
+      {x:0, y:0}
+    ];
+
+    vFinal[0].x = ((this.getMag() - other.getMag()) * vTemp[0].x + 2 * other.getMag() * vTemp[1].x) / (this.getMag() + other.getMag());
+    vFinal[0].y = vTemp[0].y;
+
+    vFinal[1].x = ((other.getMag() - this.getMag()) * vTemp[1].x + 2 * this.getMag() * vTemp[0].x) / (this.getMag() + other.getMag());
+    vFinal[1].y = vTemp[1].y;
+
+    bTemp[0].x += vFinal[0].x;
+    bTemp[1].x += vFinal[1].x;
+
+    var bFinal = [
+      {x:0, y:0},
+      {x:0, y:0}
+    ];
+
+    bFinal[0].x = cosine * bTemp[0].x - sine * bTemp[0].y;
+    bFinal[0].y = cosine * bTemp[0].y + sine * bTemp[0].x;
+    bFinal[1].x = cosine * bTemp[1].x - sine * bTemp[1].y;
+    bFinal[1].y = cosine * bTemp[1].y + sine * bTemp[1].x;
+
+    other.x = this.x + bFinal[1].x;
+    other.y = this.y + bFinal[1].y;
+
+    this.x += bFinal[0].x;
+    this.y += bFinal[0].y;
+
+    this.vel.x = cosine * vFinal[0].x - sine * vFinal[0].y;
+    this.vel.y = cosine * vFinal[0].y + sine * vFinal[0].x;
+    other.vel.x = cosine * vFinal[1].x - sine * vFinal[1].y;
+    other.vel.y = cosine * vFinal[1].y + sine * vFinal[1].x;
   },
 
   logic: function() {
