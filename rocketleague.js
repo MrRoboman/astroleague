@@ -1,5 +1,5 @@
-var shipSprite = new Image();
-shipSprite.src = './gfx/ships.png';
+var spritesheet = new Image();
+spritesheet.src = './gfx/rl_sprite.png';
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -14,9 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
     this.width = canvas.width;
     this.height = canvas.height;
 
+    this.pos = {
+      center: { x: this.width * 0.5, y: this.height * 0.5 },
+      a1: {x: this.width * 0.2, y: this.height * 0.5},
+      b1: {x: this.width * 0.8, y: this.height * 0.5},
+    };
+
+    this.ball = new Ball(this, this.width * 0.5, this.height * 0.5)
+    this.goal1 = new Goal(this, this.width * 0.2, this.height * 0.5, "#6495ed", this.ball);
+    this.goal2 = new Goal(this, this.width * 0.8, this.height * 0.5, "#eda864", this.ball);
+    this.shipA = new Ship(this, this.width * 0.2, this.height * 0.5, 0, 0);
+    this.shipB = new Ship(this, this.width * 0.8, this.height * 0.5, Math.PI, 1);
+
     this.sprites = [
-      new Ship(this, this.width * 0.20, this.height * 0.5, 0, 0),
-      new Ship(this, this.width * 0.80, this.height * 0.5, Math.PI, 1)
+      this.goal1,
+      this.goal2,
+      this.shipA,
+      this.shipB,
+      this.ball
     ];
 
     window.requestAnimationFrame(this.update.bind(this));
@@ -24,35 +39,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
   Game.prototype = {
 
+    reset: function() {
+      this.ball.reset(this.pos.center);
+      this.shipA.reset(this.pos.a1);
+      this.shipB.reset(this.pos.b1);
+    },
+
     handleInput: function() {
       this.sprites.forEach(function(sprite) {
         sprite.normalize();
       });
 
       if(window.keys.LEFT) {
-        this.sprites[1].rotateDir -= 1;
+        this.shipB.rotateDir -= 1;
       }
       if(window.keys.RIGHT) {
-        this.sprites[1].rotateDir += 1;
+        this.shipB.rotateDir += 1;
       }
       if(window.keys.UP) {
-        this.sprites[1].accelerate();
+        this.shipB.accelerate();
       }
       if(window.keys.DOWN) {
-        // this.sprites[1].deccelerate();
+        this.shipB.deccelerate();
       }
 
       if(window.keys.A) {
-        this.sprites[0].rotateDir -= 1;
+        this.shipA.rotateDir -= 1;
       }
       if(window.keys.D) {
-        this.sprites[0].rotateDir += 1;
+        this.shipA.rotateDir += 1;
       }
       if(window.keys.W) {
-        this.sprites[0].accelerate();
+        this.shipA.accelerate();
       }
       if(window.keys.S) {
-        // this.sprites[0].deccelerate();
+        this.shipA.deccelerate();
       }
     },
 
@@ -69,10 +90,12 @@ document.addEventListener('DOMContentLoaded', function() {
       //draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.sprites.forEach(function(sprite) {
-        sprite.draw(ctx, shipSprite);
+        sprite.draw(ctx, spritesheet);
       });
 
-      this.sprites[0].resolveCollision(this.sprites[1]);
+      this.shipA.resolveCollision(this.shipB);
+      this.ball.resolveCollision(this.shipA);
+      this.ball.resolveCollision(this.shipB);
 
       window.requestAnimationFrame(this.update.bind(this));
     }

@@ -6,55 +6,9 @@ function inherits(ChildClass, ParentClass) {
 }
 
 
-var Ball = function(x, y, r, color) {
-  this.x = x;
-  this.y = y;
-  this.r = r;
-  this.color = color;
-};
+var SpaceObject = function(game, x, y, rotation, type) {};
 
-
-Ball.prototype = {
-
-  draw: function(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#000';
-    ctx.stroke();
-  }
-};
-
-
-var Ship = function(game, x, y, rotation, player) {
-  this.game = game;
-
-  this.x = x;
-  this.y = y;
-  this.w = 36;
-  this.h = 36;
-  this.r = this.w / 2;
-
-  this.rotation = rotation;
-  this.rotateVel = 0.05;
-  this.rotateDir = 0; //-1:left 0:none 1:right
-
-  this.accel = {x:0, y:0};
-  this.vel = {x:0, y:0};
-
-  this.maxAccel = .4;
-  this.maxVel = 4;
-
-  this.bounceDampen = 0.5;
-
-  this.player = player;
-};
-
-// inherits(Ship, Ball);
-
-Ship.prototype = {
+SpaceObject.prototype = {
 
   left: function() {
     return this.x - this.w / 2;
@@ -70,6 +24,29 @@ Ship.prototype = {
 
   bottom: function() {
     return this.y + this.h / 2;
+  },
+
+  reset: function(pos) {
+    this.setPos(pos);
+    this.accel.x = this.accel.y = 0;
+    this.vel.x = this.vel.y = 0;
+  },
+
+  setPos: function(pos) {
+    this.x = pos.x;
+    this.y = pos.y;
+  },
+
+  boxCollision: function(other) {
+    // debugger;
+    return !(this.right() < other.left() || this.left() > other.right() ||
+             this.top() > other.bottom() || this.bottom() < this.top());
+  },
+
+  distanceTo: function(other){
+    var x = this.x - other.x;
+    var y = this.y - other.y;
+    return Math.sqrt(x*x + y*y);
   },
 
   getCurrentAngle: function() {
@@ -101,8 +78,8 @@ Ship.prototype = {
 
   //maybe make this slow the velocity to 0
   deccelerate: function() {
-    this.accel.x = Math.cos(this.rotation + Math.PI) * this.maxAccel * 0.2;
-    this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.2;
+    this.accel.x = Math.cos(this.rotation + Math.PI) * this.maxAccel * 0.5;
+    this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.5;
   },
 
   resolveCollision: function(other) {
@@ -142,10 +119,10 @@ Ship.prototype = {
       {x:0, y:0}
     ];
 
-    vFinal[0].x = ((this.getMag() - other.getMag()) * vTemp[0].x + 2 * other.getMag() * vTemp[1].x) / (this.getMag() + other.getMag());
+    vFinal[0].x = ((this.m - other.m) * vTemp[0].x + 2 * other.m * vTemp[1].x) / (this.m + other.m);
     vFinal[0].y = vTemp[0].y;
 
-    vFinal[1].x = ((other.getMag() - this.getMag()) * vTemp[1].x + 2 * this.getMag() * vTemp[0].x) / (this.getMag() + other.getMag());
+    vFinal[1].x = ((other.m - this.m) * vTemp[1].x + 2 * this.m * vTemp[0].x) / (this.m + other.m);
     vFinal[1].y = vTemp[1].y;
 
     bTemp[0].x += vFinal[0].x;
@@ -203,7 +180,7 @@ Ship.prototype = {
 
   draw: function(ctx, img) {
     var x = 0, y = 0, w = this.w, h = this.h;
-    if(this.player === 1) {
+    if(this.type === 1) {
       x = this.w;
     }
 
@@ -213,4 +190,135 @@ Ship.prototype = {
     ctx.rotate(-this.rotation);
     ctx.translate(-this.x, -this.y);
   }
+};
+
+
+var Ship = function(game, x, y, rotation, type) {
+  this.game = game;
+
+  this.type = type;
+
+  this.x = x;
+  this.y = y;
+  this.w = 36;
+  this.h = 36;
+  this.r = this.w / 2;
+  this.m = 10; // asteroid is heavier
+
+  this.rotation = rotation;
+  this.rotateVel = 0.05;
+  this.rotateDir = 0; //-1:left 0:none 1:right
+
+  this.accel = {x:0, y:0};
+  this.vel = {x:0, y:0};
+
+  this.maxAccel = .4;
+  this.maxVel = 4;
+
+  this.bounceDampen = 0.5;
+};
+
+inherits(Ship, SpaceObject);
+
+
+var State = {
+  ALIVE: 'ALIVE',
+  EXPLODE: 'EXPLODE',
+  DEAD: 'DEAD'
+};
+
+var Ball = function(game, x, y) {
+  this.game = game;
+
+  this.state = "alive";
+
+  this.x = x;
+  this.y = y;
+  this.w = 72;
+  this.h = 72;
+  this.r = this.w / 2;
+  this.m = 10; // asteroid is heavier
+
+  this.rotation = 0;
+  this.rotateVel = 0.05;
+  this.rotateDir = 0; //-1:left 0:none 1:right
+
+  this.accel = {x:0, y:0};
+  this.vel = {x:0, y:0};
+
+  this.maxAccel = .4;
+  this.maxVel = 4;
+
+  this.bounceDampen = 0.5;
+};
+
+inherits(Ball, SpaceObject);
+
+Ball.prototype.draw = function(ctx, img) {
+  var x = 0, y = 36, w = this.w, h = this.h;
+
+  ctx.translate(this.x, this.y);
+  ctx.rotate(this.rotation);
+  ctx.drawImage(img, x, y, w, h, -this.w/2, -this.h/2, this.w, this.h);
+  ctx.rotate(-this.rotation);
+  ctx.translate(-this.x, -this.y);
+};
+
+
+var Goal = function(game, x, y, color, ball) {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.r = 80;
+  this.w = this.h = this.r*2;
+  this.color = color;
+  this.ball = ball;
+  this.dashLength = 1;
+};
+
+inherits(Goal, SpaceObject);
+
+Goal.prototype.normalize = function() {};
+
+Goal.prototype.logic = function() {
+  if(this.boxCollision(this.ball)) {
+    if(this.distanceTo(this.ball) <= this.r - this.ball.r){
+      this.game.reset();
+    }
+  }
+};
+
+Goal.prototype.calcPointsCirc = function calcPointsCirc() {
+  var n = this.r/this.dashLength,
+      alpha = Math.PI * 2 / n,
+      pointObj = {},
+      points = [],
+      i = -1;
+
+  while( i < n ) {
+      var theta = alpha * i,
+          theta2 = alpha * (i+1);
+// debugger;
+      points.push({x : (Math.cos(theta) * this.r) + this.x,
+                   y : (Math.sin(theta) * this.r) + this.y,
+                   ex : (Math.cos(theta2) * this.r) + this.x,
+                   ey : (Math.sin(theta2) * this.r) + this.y});
+      i+=2;
+  }
+  return points;
+};
+
+Goal.prototype.draw = function(ctx) {
+  var pointArray= this.calcPointsCirc();
+  ctx.strokeStyle = this.color;
+  ctx.beginPath();
+// debugger;
+  for(var p = 0; p < pointArray.length; p++){
+      ctx.moveTo(pointArray[p].x, pointArray[p].y);
+      ctx.lineTo(pointArray[p].ex, pointArray[p].ey);
+      ctx.stroke();
+  }
+  // Render Collision Box
+  // ctx.fillRect(this.x - this.w/2, this.y - this.h/2, this.w, this.h);
+  ctx.closePath();
 };
