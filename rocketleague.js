@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
   Game.prototype = {
 
     reset: function() {
-      this.ball.reset(this.pos.center);
-      this.shipA.reset(this.pos.a1);
-      this.shipB.reset(this.pos.b1);
+      this.ball.reset(this.pos.center, 0);
+      this.shipA.reset(this.pos.a1, 0);
+      this.shipB.reset(this.pos.b1, Math.PI);
     },
 
     handleInput: function() {

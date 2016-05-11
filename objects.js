@@ -26,8 +26,9 @@ SpaceObject.prototype = {
     return this.y + this.h / 2;
   },
 
-  reset: function(pos) {
+  reset: function(pos, rot) {
     this.setPos(pos);
+    this.rotation = rot;
     this.accel.x = this.accel.y = 0;
     this.vel.x = this.vel.y = 0;
   },
@@ -230,7 +231,7 @@ var State = {
 var Ball = function(game, x, y) {
   this.game = game;
 
-  this.state = "alive";
+  this.state = State.ALIVE;
 
   this.x = x;
   this.y = y;
@@ -250,9 +251,17 @@ var Ball = function(game, x, y) {
   this.maxVel = 4;
 
   this.bounceDampen = 0.5;
+
+  // this.frames = [];
+  // for(var i = 72; i < 7; )
 };
 
 inherits(Ball, SpaceObject);
+
+Ball.prototype.explode = function() {
+  this.state = State.EXPLODE;
+
+},
 
 Ball.prototype.draw = function(ctx, img) {
   var x = 0, y = 36, w = this.w, h = this.h;
