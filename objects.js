@@ -31,6 +31,7 @@ SpaceObject.prototype = {
     this.rotation = rot;
     this.accel.x = this.accel.y = 0;
     this.vel.x = this.vel.y = 0;
+    this.state = State.ALIVE;
   },
 
   setPos: function(pos) {
@@ -39,7 +40,7 @@ SpaceObject.prototype = {
   },
 
   boxCollision: function(other) {
-    // debugger;
+
     return !(this.right() < other.left() || this.left() > other.right() ||
              this.top() > other.bottom() || this.bottom() < this.top());
   },
@@ -84,6 +85,7 @@ SpaceObject.prototype = {
   },
 
   resolveCollision: function(other) {
+    if(this.state !== State.ALIVE) return;
     var diffVect = {
       x: other.x - this.x,
       y: other.y - this.y
@@ -197,6 +199,7 @@ SpaceObject.prototype = {
 var Ship = function(game, x, y, rotation, type) {
   this.game = game;
 
+  this.state = State.ALIVE;
   this.type = type;
 
   this.x = x;
@@ -252,23 +255,49 @@ var Ball = function(game, x, y) {
 
   this.bounceDampen = 0.5;
 
-  // this.frames = [];
-  // for(var i = 72; i < 7; )
+  this.explosionMS = 70;
+  this.frameIdx = 0;
+  this.frames = [];
+  for(var Y = 0; Y < 72 * 2; Y += 72){
+    for(var X = 72; X < 72 * 7; X += 72){
+      this.frames.push({x:X, y:Y, w:72, h:72});
+    }
+  }
 };
 
 inherits(Ball, SpaceObject);
 
 Ball.prototype.explode = function() {
-  this.state = State.EXPLODE;
-
+  if(this.state === State.ALIVE){
+    this.state = State.EXPLODE;
+    this.vel.x = this.vel.y = 0;
+    this.frameIdx = 0;
+    this.explosionTimer = Date.now();
+  }
 },
 
 Ball.prototype.draw = function(ctx, img) {
   var x = 0, y = 36, w = this.w, h = this.h;
+  if(this.state === State.ALIVE){
+
+  }
+  else if(this.state === State.EXPLODE){
+    x = this.frames[this.frameIdx].x;
+    y = this.frames[this.frameIdx].y;
+    if(Date.now() - this.explosionTimer >= this.explosionMS){
+      this.explosionTimer = Date.now();
+      this.frameIdx++;
+      if(this.frameIdx === this.frames.length){
+        this.state = State.DEAD;
+      }
+    }
+  }
+
 
   ctx.translate(this.x, this.y);
   ctx.rotate(this.rotation);
-  ctx.drawImage(img, x, y, w, h, -this.w/2, -this.h/2, this.w, this.h);
+  if(this.state === State.ALIVE) ctx.drawImage(img, x, y, w, h, -this.w/2, -this.h/2, this.w, this.h);
+  if(this.state === State.EXPLODE) ctx.drawImage(img, x, y, w, h, -this.w*1.5, -this.h*1.5, this.w*3, this.h*3);
   ctx.rotate(-this.rotation);
   ctx.translate(-this.x, -this.y);
 };
@@ -292,7 +321,7 @@ Goal.prototype.normalize = function() {};
 Goal.prototype.logic = function() {
   if(this.boxCollision(this.ball)) {
     if(this.distanceTo(this.ball) <= this.r - this.ball.r){
-      this.game.reset();
+      this.game.ball.explode();
     }
   }
 };
@@ -307,7 +336,7 @@ Goal.prototype.calcPointsCirc = function calcPointsCirc() {
   while( i < n ) {
       var theta = alpha * i,
           theta2 = alpha * (i+1);
-// debugger;
+
       points.push({x : (Math.cos(theta) * this.r) + this.x,
                    y : (Math.sin(theta) * this.r) + this.y,
                    ex : (Math.cos(theta2) * this.r) + this.x,
@@ -321,7 +350,7 @@ Goal.prototype.draw = function(ctx) {
   var pointArray= this.calcPointsCirc();
   ctx.strokeStyle = this.color;
   ctx.beginPath();
-// debugger;
+
   for(var p = 0; p < pointArray.length; p++){
       ctx.moveTo(pointArray[p].x, pointArray[p].y);
       ctx.lineTo(pointArray[p].ex, pointArray[p].ey);

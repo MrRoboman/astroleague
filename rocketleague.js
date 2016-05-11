@@ -1,5 +1,5 @@
 var spritesheet = new Image();
-spritesheet.src = './gfx/rl_sprite.png';
+spritesheet.src = './gfx/spritesheet.png';
 
 document.addEventListener('DOMContentLoaded', function() {
 
