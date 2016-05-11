@@ -303,14 +303,15 @@ Ball.prototype.draw = function(ctx, img) {
 };
 
 
-var Goal = function(game, x, y, color, ball) {
+var Goal = function(game, x, y, color, id) {
+  this.id = id;
   this.game = game;
   this.x = x;
   this.y = y;
   this.r = 80;
   this.w = this.h = this.r*2;
   this.color = color;
-  this.ball = ball;
+  this.ball = this.game.ball;
   this.dashLength = 1;
 };
 
@@ -321,7 +322,7 @@ Goal.prototype.normalize = function() {};
 Goal.prototype.logic = function() {
   if(this.boxCollision(this.ball)) {
     if(this.distanceTo(this.ball) <= this.r - this.ball.r){
-      this.game.ball.explode();
+      this.game.score(this.id);
     }
   }
 };

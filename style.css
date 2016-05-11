@@ -1,9 +1,33 @@
 #canvas-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#scoreboard {
+  display: flex;
+  justify-content: space-between;
+  width: 700px;
+}
+
+.scoreboard {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 64px;
+}
+
+.score {
+  padding: 10px;
+  width: 80px;
+  text-align: center;
+}
+
+.timer {
+  padding: 10px;
+  width: 200px;
+  text-align: center;
 }
 
 #canvas {
   background: lightgreen;
-  margin-top: 100px;
 }
