@@ -114,9 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // }
 
       if(window.keys.A) {
+        if(!this.shipA.stunned())
         this.shipA.rotateDir -= 1;
       }
       if(window.keys.D) {
+        if(!this.shipA.stunned())
         this.shipA.rotateDir += 1;
       }
       if(window.keys.W) {

@@ -31,6 +31,7 @@ SpaceObject.prototype = {
     this.rotation = rot;
     this.accel.x = this.accel.y = 0;
     this.vel.x = this.vel.y = 0;
+    this.stunTime = 0;
     this.state = State.ALIVE;
   },
 
@@ -74,18 +75,24 @@ SpaceObject.prototype = {
   },
 
   accelerate: function() {
+    if(this.stunned()) return;
     this.accel.x = Math.cos(this.rotation) * this.maxAccel;
     this.accel.y = Math.sin(this.rotation) * this.maxAccel;
   },
 
   //maybe make this slow the velocity to 0
   deccelerate: function() {
+    if(this.stunned()) return;
     this.accel.x = Math.cos(this.rotation + Math.PI) * this.maxAccel * 0.5;
     this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.5;
   },
 
   stun: function() {
+    this.stunTime = Date.now();
+  },
 
+  stunned: function() {
+    return Date.now() - this.stunTime < 50;
   },
 
   resolveCollision: function(other) {
@@ -98,6 +105,8 @@ SpaceObject.prototype = {
     var diffMag = Math.sqrt(diffVect.y * diffVect.y + diffVect.x * diffVect.x);
 
     if(diffMag >= this.r + other.r) return false;
+
+    other.stun();
 
     var theta = Math.atan2(diffVect.y, diffVect.x);
     var sine = Math.sin(theta);

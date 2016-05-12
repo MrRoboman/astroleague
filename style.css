@@ -35,5 +35,6 @@
 }
 
 #canvas {
-  background: lightgreen;
+  background: gray;
+  /*background: lightgreen;*/
 }
