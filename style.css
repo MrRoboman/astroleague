@@ -45,3 +45,9 @@ body {
   /*background: gray;*/
   /*background: lightgreen;*/
 }
+
+#instructions {
+  color: white;
+  font-size: 20px;
+  font-family: 'Orbitron', sans-serif;
+}

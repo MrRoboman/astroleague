@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
       this.countdownTimer -= elapsed;
       var seconds = Math.ceil(this.countdownTimer / 1000);
       if(seconds > 0){
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'white';
         ctx.font = "48px Orbitron, sans-serif";
         ctx.fillText(seconds.toString(), this.width/2 - 20, this.height/2 - 50);
         if(this.overtime){
