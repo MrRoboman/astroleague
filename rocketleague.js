@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.height = canvas.height;
 
     this.state = GameState.COUNTDOWN;
-    this.scores = [0,0];
+
     this.timeToNextRound = 2000;
 
     this.pos = {
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.goal1 = new Goal(this, this.width * 0.2, this.height * 0.5, "#6495ed", 0);
     this.goal2 = new Goal(this, this.width * 0.8, this.height * 0.5, "#eda864", 1);
     this.shipA = new Ship(this, this.width * 0.2, this.height * 0.5, 0, 0);
-    this.shipB = new Ship(this, this.width * 0.8, this.height * 0.5, Math.PI, 1);
+    this.shipB = new AiShip(this, this.width * 0.8, this.height * 0.5, Math.PI, 1);
 
     this.sprites = [
       this.goal1,
@@ -59,13 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     resetGame: function() {
       this.gameTimer = 60000;
+      this.overtime = false;
+      this.scores = [0,0];
       this.reset();
     },
 
     reset: function() {
       this.ball.reset(this.pos.center, 0);
-      this.shipA.reset(this.pos.a1, 0);
-      this.shipB.reset(this.pos.b1, Math.PI);
+      this.shipA.reset(this.pos.a1, 0 + .5);
+      this.shipB.reset(this.pos.b1, Math.PI + .5);
       this.countdown();
     },
 
@@ -98,18 +100,18 @@ document.addEventListener('DOMContentLoaded', function() {
         sprite.normalize();
       });
 
-      if(window.keys.LEFT) {
-        this.shipB.rotateDir -= 1;
-      }
-      if(window.keys.RIGHT) {
-        this.shipB.rotateDir += 1;
-      }
-      if(window.keys.UP) {
-        this.shipB.accelerate();
-      }
-      if(window.keys.DOWN) {
-        this.shipB.deccelerate();
-      }
+      // if(window.keys.LEFT) {
+      //   this.shipB.rotateDir -= 1;
+      // }
+      // if(window.keys.RIGHT) {
+      //   this.shipB.rotateDir += 1;
+      // }
+      // if(window.keys.UP) {
+      //   this.shipB.accelerate();
+      // }
+      // if(window.keys.DOWN) {
+      //   this.shipB.deccelerate();
+      // }
 
       if(window.keys.A) {
         this.shipA.rotateDir -= 1;
@@ -126,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
 
     getGameTime: function() {
-      var seconds = Math.floor(this.gameTimer / 1000);
+      var seconds = Math.ceil(this.gameTimer / 1000);
       var minutes = Math.floor(seconds / 60);
       seconds %= 60;
       if(seconds < 10) seconds = "0" + seconds;
@@ -134,11 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
     },
 
     handleTimer: function() {
+      if(this.overtime) return;
       var elapsed = Date.now() - this.lastTime;
       this.lastTime = Date.now();
       this.gameTimer -= elapsed;
       timer.innerHTML = this.getGameTime();
-      if(this.gameTimer < 1000){
+      if(this.gameTimer < 0){
         this.state = GameState.GAMEOVER;
       }
     },
@@ -152,6 +155,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = 'black';
         ctx.font = "48px Orbitron, sans-serif";
         ctx.fillText(seconds.toString(), this.width/2 - 20, this.height/2 - 50);
+        if(this.overtime){
+          // ctx.fillText("OVERTIME", 264, 102);
+          ctx.fillText("OVERTIME", 260, 100);
+        }
       }
       else {
         this.play();
@@ -173,6 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
           sprite.logic();
         });
 
+        this.shipA.resolveCollision(this.shipB);
+
+        this.ball.resolveCollision(this.shipA);
+        this.ball.resolveCollision(this.shipB);
       }
 
       //draw
@@ -181,18 +192,44 @@ document.addEventListener('DOMContentLoaded', function() {
         sprite.draw(ctx, spritesheet);
       });
 
-      this.shipA.resolveCollision(this.shipB);
-      this.ball.resolveCollision(this.shipA);
-      this.ball.resolveCollision(this.shipB);
 
       if(this.state === GameState.EXPLODE){
         if(Date.now() - this.nextRoundTimer >= this.timeToNextRound){
-          this.reset();
+          if(this.overtime){
+            this.state = GameState.GAMEOVER;
+          }
+          else {
+            this.reset();
+          }
         }
       }
 
       if(this.state === GameState.COUNTDOWN){
         this.drawCountdown();
+      }
+
+      if(this.state === GameState.GAMEOVER) {
+        if(this.scores[0] === this.scores[1]) {
+          this.overtime = true;
+          this.reset();
+        }
+        else {
+          ctx.font = "48px Orbitron, sans-serif";
+          var text;
+          if(this.scores[0] < this.scores[1]) {
+            text = "Blue Wins!";
+            ctx.fillStyle = 'black';
+            ctx.fillText(text, 269,102);
+            ctx.fillStyle = "#6495ed";
+            ctx.fillText(text, 267,100);
+          }else {
+            text = "Orange Wins!";
+            ctx.fillStyle = 'black';
+            ctx.fillText(text, 232,102);
+            ctx.fillStyle = "#eda864";
+            ctx.fillText(text, 230,100);
+          }
+        }
       }
 
       window.requestAnimationFrame(this.update.bind(this));

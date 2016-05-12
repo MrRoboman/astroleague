@@ -84,6 +84,10 @@ SpaceObject.prototype = {
     this.accel.y = Math.sin(this.rotation + Math.PI) * this.maxAccel * 0.5;
   },
 
+  stun: function() {
+
+  },
+
   resolveCollision: function(other) {
     if(this.state !== State.ALIVE) return;
     var diffVect = {
@@ -93,7 +97,7 @@ SpaceObject.prototype = {
 
     var diffMag = Math.sqrt(diffVect.y * diffVect.y + diffVect.x * diffVect.x);
 
-    if(diffMag >= this.r + other.r) return;
+    if(diffMag >= this.r + other.r) return false;
 
     var theta = Math.atan2(diffVect.y, diffVect.x);
     var sine = Math.sin(theta);
@@ -151,6 +155,8 @@ SpaceObject.prototype = {
     this.vel.y = cosine * vFinal[0].y + sine * vFinal[0].x;
     other.vel.x = cosine * vFinal[1].x - sine * vFinal[1].y;
     other.vel.y = cosine * vFinal[1].y + sine * vFinal[1].x;
+
+    return true;
   },
 
   logic: function() {
@@ -360,4 +366,73 @@ Goal.prototype.draw = function(ctx) {
   // Render Collision Box
   // ctx.fillRect(this.x - this.w/2, this.y - this.h/2, this.w, this.h);
   ctx.closePath();
+};
+
+
+
+var AiShip = function(game, x, y, rotation, type, ai) {
+  this.game = game;
+
+  this.state = State.ALIVE;
+  this.type = type;
+
+  this.x = x;
+  this.y = y;
+  this.w = 36;
+  this.h = 36;
+  this.r = this.w / 2;
+  this.m = 10; // asteroid is heavier
+
+  this.rotation = rotation;
+  this.rotateVel = 0.05;
+  this.rotateDir = 0; //-1:left 0:none 1:right
+
+  this.accel = {x:0, y:0};
+  this.vel = {x:0, y:0};
+
+  this.maxAccel = .4;
+  this.maxVel = 4;
+
+  this.bounceDampen = 0.5;
+};
+
+inherits(AiShip, SpaceObject);
+
+AiShip.prototype.logic = function() {
+// debugger;
+  // var direction = Math.atan2(this.game.ball.y - this.y, this.game.ball.x - this.y);
+  var direction = Math.atan2(this.game.ball.y - this.y, this.game.ball.x - this.x);
+  if(direction < this.rotation){
+    this.rotateDir = -1;
+  }else {
+    this.rotateDir = 1;
+  }
+
+  this.accelerate();
+
+  this.rotation += this.rotateVel * this.rotateDir;
+  this.vel.x += this.accel.x;
+  this.vel.y += this.accel.y;
+  this.capVelocity();
+  // if(this.vel > this.maxVel) this.vel = this.maxVel;
+  this.x += this.vel.x;
+  this.y += this.vel.y;
+
+  if(this.left() < 0) {
+    this.x = this.w / 2;
+    this.vel.x = -this.vel.x * this.bounceDampen;
+  }
+  else if(this.right() > this.game.width){
+    this.x = this.game.width - this.w / 2;
+    this.vel.x = -this.vel.x * this.bounceDampen;
+  }
+
+  if(this.top() < 0) {
+    this.y = this.h / 2;
+    this.vel.y = -this.vel.y * this.bounceDampen;
+  }
+  else if(this.bottom() > this.game.height){
+    this.y = this.game.height - this.h / 2;
+    this.vel.y = -this.vel.y * this.bounceDampen;
+  }
 };

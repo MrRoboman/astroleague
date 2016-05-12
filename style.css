@@ -5,6 +5,12 @@
   flex-direction: column;
 }
 
+#title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 72px;
+  margin: 30px 0;
+}
+
 #scoreboard {
   display: flex;
   justify-content: space-between;
