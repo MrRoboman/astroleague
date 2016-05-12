@@ -102,6 +102,18 @@ document.addEventListener('DOMContentLoaded', function() {
         sprite.normalize();
       });
 
+      if(window.keys.LEFT) {
+        this.shipA.rotateDir -= 1;
+      }
+      if(window.keys.RIGHT) {
+        this.shipA.rotateDir += 1;
+      }
+      if(window.keys.UP) {
+        this.shipA.accelerate();
+      }
+      if(window.keys.DOWN) {
+        this.shipA.deccelerate();
+      }
       // if(window.keys.LEFT) {
       //   this.shipB.rotateDir -= 1;
       // }
@@ -115,20 +127,20 @@ document.addEventListener('DOMContentLoaded', function() {
       //   this.shipB.deccelerate();
       // }
 
-      if(window.keys.A) {
-        if(!this.shipA.stunned())
-        this.shipA.rotateDir -= 1;
-      }
-      if(window.keys.D) {
-        if(!this.shipA.stunned())
-        this.shipA.rotateDir += 1;
-      }
-      if(window.keys.W) {
-        this.shipA.accelerate();
-      }
-      if(window.keys.S) {
-        this.shipA.deccelerate();
-      }
+      // if(window.keys.A) {
+      //   if(!this.shipA.stunned())
+      //   this.shipA.rotateDir -= 1;
+      // }
+      // if(window.keys.D) {
+      //   if(!this.shipA.stunned())
+      //   this.shipA.rotateDir += 1;
+      // }
+      // if(window.keys.W) {
+      //   this.shipA.accelerate();
+      // }
+      // if(window.keys.S) {
+      //   this.shipA.deccelerate();
+      // }
     },
 
     getGameTime: function() {
