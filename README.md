@@ -4,9 +4,9 @@ Play soccer in space!
 
 ## Gameplay
 
-Astro League is a mashup of Asteroids and Rocket League.
-Use your ship to push the asteroid into your opponent's goal.
-Score the most points in one minute to win!
+* Astro League is a mashup of Asteroids and Rocket League.
+* Use your ship to push the asteroid into your opponent's goal.
+* Score the most points in one minute to win!
 
 ## Controls
 
