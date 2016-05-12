@@ -1,3 +1,5 @@
+// Astro League!
+
 var spritesheet = new Image();
 spritesheet.src = './gfx/spritesheet.png';
 
