@@ -58,19 +58,22 @@ document.addEventListener('DOMContentLoaded', function() {
   Game.prototype = {
 
     resetGame: function() {
-      this.gameTimer = 2000;
+      this.gameTimer = 60000;
+      this.reset();
     },
 
     reset: function() {
       this.ball.reset(this.pos.center, 0);
       this.shipA.reset(this.pos.a1, 0);
       this.shipB.reset(this.pos.b1, Math.PI);
-      this.state = GameState.PLAY;
+      this.countdown();
     },
 
     countdown: function() {
       this.state = GameState.COUNTDOWN;
-    }
+      this.countdownTimer = 3000;
+      this.lastCountdownTime = Date.now();
+    },
 
     play: function() {
       this.state = GameState.PLAY;
@@ -140,6 +143,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     },
 
+    drawCountdown: function() {
+      var elapsed = Date.now() - this.lastCountdownTime;
+      this.lastCountdownTime = Date.now();
+      this.countdownTimer -= elapsed;
+      var seconds = Math.ceil(this.countdownTimer / 1000);
+      if(seconds > 0){
+        ctx.fillStyle = 'black';
+        ctx.font = "48px Orbitron, sans-serif";
+        ctx.fillText(seconds.toString(), this.width/2 - 20, this.height/2 - 50);
+      }
+      else {
+        this.play();
+      }
+    },
+
     update: function() {
 
       if(this.state === GameState.PLAY){
@@ -171,6 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if(Date.now() - this.nextRoundTimer >= this.timeToNextRound){
           this.reset();
         }
+      }
+
+      if(this.state === GameState.COUNTDOWN){
+        this.drawCountdown();
       }
 
       window.requestAnimationFrame(this.update.bind(this));
