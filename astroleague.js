@@ -59,11 +59,17 @@ document.addEventListener('DOMContentLoaded', function() {
   Game.prototype = {
 
     resetGame: function() {
-      this.state = GameState.PREGAME;
+      this.shipA.ai = true;
+      this.shipB.ai = true;
       this.gameTimer = 60000;
       this.overtime = false;
       this.scores = [0,0];
+      timer.innerHTML = this.getGameTime();
+      scoreboard[0].innerHTML = 0;
+      scoreboard[1].innerHTML = 0;
       this.reset();
+      this.state = GameState.PREGAME;
+
     },
 
     reset: function() {
@@ -171,7 +177,36 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     },
 
+    handlePregameInput: function() {
+      if(keys.A || keys.S || keys.D || keys.W){
+        this.countdown();
+        this.shipA.ai = false;
+      }
+      if(keys.DOWN || keys.UP || keys.LEFT || keys.RIGHT){
+        this.countdown();
+        this.shipB.ai = false;
+      }
+    },
+
+    handlePregameDraw: function() {
+      ctx.font = "28px sans-serif";
+      ctx.fillStyle = "white";
+      ctx.fillText("W A S D", 107, 100);
+      ctx.fillText("← → ↑ ↓", 587, 100);
+      ctx.fillText("Push asteroid into opponent's ring", 197, 310);
+      ctx.fillText("'R' resets the game", 280, 344);
+      ctx.fillText("Press WASD and/or ARROWS to start", 173, 380);
+    },
+
     update: function() {
+
+      if(window.keys.R){
+        this.resetGame();
+      }
+
+      if(this.state === GameState.PREGAME){
+        this.handlePregameInput();
+      }
 
       if(this.state === GameState.PLAY){
 
@@ -197,6 +232,10 @@ document.addEventListener('DOMContentLoaded', function() {
       this.sprites.forEach(function(sprite) {
         sprite.draw(ctx, spritesheet);
       });
+
+      if(this.state === GameState.PREGAME){
+        this.handlePregameDraw();
+      }
 
 
       if(this.state === GameState.EXPLODE){

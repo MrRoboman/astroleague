@@ -6,7 +6,8 @@ window.keys = {
   A: false,
   S: false,
   D: false,
-  W: false
+  W: false,
+  R: false
 };
 
 window.addEventListener('keydown', function(e) {
@@ -34,6 +35,9 @@ window.addEventListener('keydown', function(e) {
       break;
     case 83:
       window.keys.S = true;
+      break;
+    case 82:
+      window.keys.R = true;
       break;
   }
 });
@@ -63,6 +67,9 @@ window.addEventListener('keyup', function(e) {
       break;
     case 83:
       window.keys.S = false;
+      break;
+    case 82:
+      window.keys.R = false;
       break;
   }
 });
