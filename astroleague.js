@@ -4,6 +4,7 @@ var spritesheet = new Image();
 spritesheet.src = './gfx/spritesheet.png';
 
 var GameState = {
+  PREGAME: 'PREGAME',
   COUNTDOWN: 'COUNTDOWN',
   PLAY: 'PLAY',
   EXPLODE: 'EXPLODE'
@@ -28,9 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.width = canvas.width;
     this.height = canvas.height;
 
-    this.state = GameState.COUNTDOWN;
-
-    this.timeToNextRound = 2000;
+    this.explosionWaitTime = 2000;
 
     this.pos = {
       center: { x: this.width * 0.5, y: this.height * 0.5 },
@@ -60,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
   Game.prototype = {
 
     resetGame: function() {
+      this.state = GameState.PREGAME;
       this.gameTimer = 60000;
       this.overtime = false;
       this.scores = [0,0];
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
       if(this.state === GameState.EXPLODE){
-        if(Date.now() - this.nextRoundTimer >= this.timeToNextRound){
+        if(Date.now() - this.nextRoundTimer >= this.explosionWaitTime){
           if(this.overtime){
             this.state = GameState.GAMEOVER;
           }
