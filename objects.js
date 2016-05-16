@@ -216,6 +216,7 @@ var Ship = function(game, x, y, rotation, type) {
 
   this.state = State.ALIVE;
   this.type = type;
+  this.ai = true;
 
   this.x = x;
   this.y = y;
@@ -378,46 +379,47 @@ Goal.prototype.draw = function(ctx) {
 };
 
 
+//
+// var AiShip = function(game, x, y, rotation, type, ai) {
+//   this.game = game;
+//
+//   this.state = State.ALIVE;
+//   this.type = type;
+//
+//   this.x = x;
+//   this.y = y;
+//   this.w = 36;
+//   this.h = 36;
+//   this.r = this.w / 2;
+//   this.m = 10; // asteroid is heavier
+//
+//   this.rotation = rotation;
+//   this.rotateVel = 0.05;
+//   this.rotateDir = 0; //-1:left 0:none 1:right
+//
+//   this.accel = {x:0, y:0};
+//   this.vel = {x:0, y:0};
+//
+//   this.maxAccel = .4;
+//   this.maxVel = 4;
+//
+//   this.bounceDampen = 0.5;
+// };
+//
+// inherits(AiShip, SpaceObject);
 
-var AiShip = function(game, x, y, rotation, type, ai) {
-  this.game = game;
+Ship.prototype.logic = function() {
+  if(this.ai){
+    var direction = Math.atan2(this.game.ball.y - this.y, this.game.ball.x - this.x);
+    if(direction < this.rotation){
+      this.rotateDir = -1;
+    }else {
+      this.rotateDir = 1;
+    }
 
-  this.state = State.ALIVE;
-  this.type = type;
-
-  this.x = x;
-  this.y = y;
-  this.w = 36;
-  this.h = 36;
-  this.r = this.w / 2;
-  this.m = 10; // asteroid is heavier
-
-  this.rotation = rotation;
-  this.rotateVel = 0.05;
-  this.rotateDir = 0; //-1:left 0:none 1:right
-
-  this.accel = {x:0, y:0};
-  this.vel = {x:0, y:0};
-
-  this.maxAccel = .4;
-  this.maxVel = 4;
-
-  this.bounceDampen = 0.5;
-};
-
-inherits(AiShip, SpaceObject);
-
-AiShip.prototype.logic = function() {
-// debugger;
-  // var direction = Math.atan2(this.game.ball.y - this.y, this.game.ball.x - this.y);
-  var direction = Math.atan2(this.game.ball.y - this.y, this.game.ball.x - this.x);
-  if(direction < this.rotation){
-    this.rotateDir = -1;
-  }else {
-    this.rotateDir = 1;
+    this.accelerate();
   }
 
-  this.accelerate();
 
   this.rotation += this.rotateVel * this.rotateDir;
   this.vel.x += this.accel.x;

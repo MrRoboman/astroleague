@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.goal1 = new Goal(this, this.width * 0.2, this.height * 0.5, "#6495ed", 0);
     this.goal2 = new Goal(this, this.width * 0.8, this.height * 0.5, "#eda864", 1);
     this.shipA = new Ship(this, this.width * 0.2, this.height * 0.5, 0, 0);
-    this.shipB = new AiShip(this, this.width * 0.8, this.height * 0.5, Math.PI, 1);
+    this.shipB = new Ship(this, this.width * 0.8, this.height * 0.5, Math.PI, 1);
 
     this.sprites = [
       this.goal1,
@@ -102,45 +102,55 @@ document.addEventListener('DOMContentLoaded', function() {
         sprite.normalize();
       });
 
-      if(window.keys.LEFT) {
-        this.shipA.rotateDir -= 1;
-      }
-      if(window.keys.RIGHT) {
-        this.shipA.rotateDir += 1;
-      }
-      if(window.keys.UP) {
-        this.shipA.accelerate();
-      }
-      if(window.keys.DOWN) {
-        this.shipA.deccelerate();
-      }
       // if(window.keys.LEFT) {
-      //   this.shipB.rotateDir -= 1;
-      // }
-      // if(window.keys.RIGHT) {
-      //   this.shipB.rotateDir += 1;
-      // }
-      // if(window.keys.UP) {
-      //   this.shipB.accelerate();
-      // }
-      // if(window.keys.DOWN) {
-      //   this.shipB.deccelerate();
-      // }
-
-      // if(window.keys.A) {
-      //   if(!this.shipA.stunned())
       //   this.shipA.rotateDir -= 1;
       // }
-      // if(window.keys.D) {
-      //   if(!this.shipA.stunned())
+      // if(window.keys.RIGHT) {
       //   this.shipA.rotateDir += 1;
       // }
-      // if(window.keys.W) {
+      // if(window.keys.UP) {
       //   this.shipA.accelerate();
       // }
-      // if(window.keys.S) {
+      // if(window.keys.DOWN) {
       //   this.shipA.deccelerate();
       // }
+
+
+      if(window.keys.LEFT) {
+        this.shipB.rotateDir -= 1;
+        this.shipB.ai = false;
+      }
+      if(window.keys.RIGHT) {
+        this.shipB.rotateDir += 1;
+        this.shipB.ai = false;
+      }
+      if(window.keys.UP) {
+        this.shipB.accelerate();
+        this.shipB.ai = false;
+      }
+      if(window.keys.DOWN) {
+        this.shipB.deccelerate();
+        this.shipB.ai = false;
+      }
+
+      if(window.keys.A) {
+        if(!this.shipA.stunned())
+        this.shipA.rotateDir -= 1;
+        this.shipA.ai = false;
+      }
+      if(window.keys.D) {
+        if(!this.shipA.stunned())
+        this.shipA.rotateDir += 1;
+        this.shipA.ai = false;
+      }
+      if(window.keys.W) {
+        this.shipA.accelerate();
+        this.shipA.ai = false;
+      }
+      if(window.keys.S) {
+        this.shipA.deccelerate();
+        this.shipA.ai = false;
+      }
     },
 
     getGameTime: function() {
