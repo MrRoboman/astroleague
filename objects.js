@@ -51,6 +51,10 @@ SpaceObject.prototype = {
     return Math.sqrt(x*x + y*y);
   },
 
+  angleTo: function(other){
+    return Math.atan2(other.y - this.y, other.x - this.x);
+  },
+
   getCurrentAngle: function() {
     return Math.atan2(this.vel.y, this.vel.x);
   },
@@ -151,6 +155,13 @@ SpaceObject.prototype = {
     this.vel.y = cosine * vFinal[0].y + sine * vFinal[0].x;
     other.vel.x = cosine * vFinal[1].x - sine * vFinal[1].y;
     other.vel.y = cosine * vFinal[1].y + sine * vFinal[1].x;
+
+    //Move colliding objects out of each other, fixes bug where they stick
+    if(this.distanceTo(other) < this.r + other.r){
+      var angle = this.angleTo(other);
+      other.x = this.x + Math.cos(angle) * (this.r + other.r + 2);
+      other.y = this.y + Math.sin(angle) * (this.r + other.r + 2);
+    }
 
     return true;
   },
