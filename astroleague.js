@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return minutes + ":" + seconds;
     },
 
-    handleTimer: function() {
+    handleClock: function() {
       if(this.overtime) return;
       var elapsed = Date.now() - this.lastTime;
       this.lastTime = Date.now();
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if(this.state === GameState.PLAY){
 
         //timer
-        this.handleTimer();
+        this.handleClock();
 
         //input
         this.handleInput();
