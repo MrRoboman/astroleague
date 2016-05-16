@@ -93,28 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     },
 
-    // updateScoreboard: function() {
-    //   scoreboard[0].innerHTML = this.
-    // },
-
     handleInput: function() {
       this.sprites.forEach(function(sprite) {
         sprite.normalize();
       });
-
-      // if(window.keys.LEFT) {
-      //   this.shipA.rotateDir -= 1;
-      // }
-      // if(window.keys.RIGHT) {
-      //   this.shipA.rotateDir += 1;
-      // }
-      // if(window.keys.UP) {
-      //   this.shipA.accelerate();
-      // }
-      // if(window.keys.DOWN) {
-      //   this.shipA.deccelerate();
-      // }
-
 
       if(window.keys.LEFT) {
         this.shipB.rotateDir -= 1;
@@ -261,5 +243,5 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   new Game();
-  // window.requestAnimationFrame(update.bind(this));
+
 });
