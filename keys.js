@@ -11,7 +11,6 @@ window.keys = {
 };
 
 window.addEventListener('keydown', function(e) {
-  console.log(e.keyCode);
   switch(e.keyCode) {
     case 37:
       window.keys.LEFT = true;
