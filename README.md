@@ -10,11 +10,25 @@ Play soccer in space!
 
 ## Controls
 
-ARROW KEYS - Moves the blue ship
+Each ship starts with AI enabled.
+To disable AI of a ship, press any of the following controls:
+
+WASD KEYS - Moves the BLUE ship
+* W - accelerate
+* S - decelerate/reverse
+* A - rotate left
+* D - rotate right
+
+ARROW KEYS - Moves the ORANGE ship
 * UP    - accelerate
 * DOWN  - decelerate/reverse
 * LEFT  - rotate left
 * RIGHT - rotate right
+
+## Online Multiplayer
+
+Astro League has a stretch goal of implementing realtime online multiplayer with
+socket.io and node.js.
 
 ## Screenshots
 
