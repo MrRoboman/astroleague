@@ -13,15 +13,19 @@ window.keys = {
 window.addEventListener('keydown', function(e) {
   switch(e.keyCode) {
     case 37:
+      e.preventDefault();
       window.keys.LEFT = true;
       break;
     case 38:
+      e.preventDefault();
       window.keys.UP = true;
       break;
     case 39:
+      e.preventDefault();
       window.keys.RIGHT = true;
       break;
     case 40:
+      e.preventDefault();
       window.keys.DOWN = true;
       break;
     case 65:
